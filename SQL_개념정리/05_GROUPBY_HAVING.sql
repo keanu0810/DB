@@ -107,3 +107,261 @@ DEPT_CODE 평균급여
 D5	      2626666
 D6	      3366666
 */
+
+--여러 컬럼을 묶어서 그룹으로 지정 가능
+
+--GROUP BY 사용시 주의할 점
+
+--> SELECT문에 GROUP BY 절을 사용할 경우
+-- SELECT 절에 명시한 조회 커럼 중 그룹 함수가 적용되지 않은 컬럼은
+--모두 GROUP BY 절에 작성해야함
+
+--EMPLOYEE 테이블에서 부서별로 같은 직급인 사원의 급여 합계를 조회하고
+-- 부서코드 오름차순으로 정렬
+
+SELECT DEPT_CODE, JOB_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY DEPT_CODE, JOB_CODE
+ORDER BY DEPT_CODE;-- ASC 생략
+
+/*
+EMPLOYEE 테이블에서 부고코드(DEPT_CODE) 직급코드(JOB_CODE)각 코드별로
+급여 합계 계산해서 그룹화 하고, 부서코드 순서대로 정렬
+D1	    J6	6440000
+D1	    J7	1380000
+D2	    J4	6520000
+D5	    J3	3500000
+D5	    J5	8460000
+D5	    J7	3800000
+D6	    J3	7300000
+D6	    J4	2800000
+D8	    J6	6986240
+D9	    J1	8000000
+D9	    J2	9700000
+NULL	J6	2320000
+NULL	J7	2890000
+
+예를 들어 KH 테이블 존재 컬럼 T 반 U 반 존재
+
+T반 총 학생수가 궁금 어떤 학생수 성별 학생수
+SELECT T반, 성별 SUM(총학생수)
+FROM KH
+GROUP BY T반, 성별
+ORDER BY 가나다순 정렬
+    */
+    
+---------------------------------------------------------------------------
+WHERE 절 : 지정된 테이블에서 어떤 행만을 조회 결과로 삼을 것인지 조건을 지정한느 구문
+        (테이블 내에서 특정 컬럼만 뽑아서 사용하겠다는 조건문)
+        
+HAVING 절 : 그룹 함수로 구해 올 그룹에 대한 조건을 설정할 때 사용
+            (그룹에 대한 조건, 어떤 그룹만 조회하겠다)
+            
+--부서별 평균 급여가 3000000원 이상인 사원만 조회하고 오름차순 정렬
+SELECT CEPTT_CODE, AVG(SALARY)
+FROM EMPLOYEE
+WHERE SALARY >= 3000000
+GROUP BY DEPT_CODE
+ORDER BY DEPT_CDDE;
+
+--부서별 평균 급여가 3000000원 이상인 부서를 조회하고 부서코드 오름차순 정렬
+--> 모든 직원들을 대상으로 그룹화한 후, 각 부서별로 평균 급여를 계산
+--->HAVING 절을 이용해서 계산된 평균 급여가 3,000,000원 이상인 부서만 필터링
+----> 모ㅡㄴ 급여를 고려해서 평균을 계산한 다음 조건에 맞는 결과만 필터링
+SELECT CEPTT_CODE, AVG(SALARY)
+FROM EMPLOYEE
+--WHERE SALARY >= 3000000
+GROUP BY DEPT_CODE
+ORDER BY DEPT_CDDE;
+HAVING AVG(SALARY) >=30000000
+ORDER BY DEPT_CODE;
+
+/*
+D1  3660000
+D5  3630000
+D6  3650000 
+D9  5900000
+
+D6
+D9
+
+WHERE 절의 경우 조건에 맞는 값이나 가지고  온 후 보여준다면
+HIVING 절의 경우 모든 값을 확인하고 조건에 부합하는 그룹만 보여줌
+*/
+
+--집계함수 (ROLLUP, CUBE)
+-- 그룹 별 산출한 결과 값의 집계를 계산하는 함수
+-- GROUP BY 절에서만 작성할 수 있는 함수
+-- WHERE ORDER SELECT 에서 사용하지 않고 GROUP BY 에서 작성
+
+--ROLLUP 함수 : 그룹별로 중간 집계를 처리하는 함수
+--그룹별로 묶여진 값에 대한 '중간 집계'와;총집계'를 계산해서 자동으로 추가하는 함수
+--* 인자로 전달받은 그룹중에서 가장 먼저 지정한 그룹별 합계와 총 합계를 구하는 함수
+
+--EMPLOYEE 테이블에서
+--각 부서에 소속된 지급 별 급여합
+--부서별 급여 합
+--전체 직원 급여 총합 조회
+
+SELECT DEPT_CODE, JOB_CODE,SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY ROLLUP(DEPT_CODE,JOB_CODE)
+ORDER BY DEPT_CODE;
+/*
+--> employee 테이블에서 DEPT_CODE와 JOB_CODE 기준으로 SALARY 합계 구함
+특정그룹의 합계 전체
+부서코드가 동일한 모든 행의 합계
+모든 합계
+그룹의합계
+부서 직급 월급합
+D1	J6	6440000
+D1	J7	1380000
+D1		7820000
+D2	J4	6520000
+D2		6520000
+D5	J3	3500000
+D5	J5	8460000
+D5	J7	3800000
+D5		15760000
+D6	J3	7300000
+D6	J4	2800000
+D6		10100000
+D8	J6	6986240
+D8		6986240
+D9	J1	8000000
+D9	J2	9700000
+D9		17700000
+	J6	2320000
+	J7	2890000
+		5210000
+		70096240
+D1	J6	J6 <--D1 부서의 J6 직급급여 합계
+D1	J7	J7 <--D1 부서의 J7 직급급여 합계
+D1		   <--D1 부서 전체의급여 합계(소계)
+D2	J4	J4 <--D2 부서 J4 직급 급여 합계
+D2		   <--D2 부서의 전체급여합계 (소계)
+D5	J3	J3 <--D2 부서 J3 직급 급여 합계
+D5	J5	J5 <--D2 부서 J5 직급 급여 합계
+D5	J7	J7 <--D2 부서 J7 직급 급여 합계
+D5	         <--D2 부서의 전체(J3,J5.J7)급여합계 (소계)	
+D6	J3	J3
+D6	J4	J4
+D6		
+D8	J6	J6
+D8		
+D9	J1	J1
+D9	J2	J2
+D9		
+	J6	J6
+	J7	J7
+		
+        
+카페의민족
+
+빠나쁘레소 아메리카노 총매출
+        카페라떼 총매출
+        아메리카노 + 카페라떼 총 매출
+        
+맥아커피 아메리카노 총매출
+        카페라떼 총매출
+        아메리카노 + 카페라떼 총 매출
+		
+*/
+
+--CUBE 함수 : 그룹별 산출한 결과를 집꼐하는 함수
+-- * 그룹으로 지정된 모든 그룹에 대한 집계와 총합계 함수
+
+SELECT DEPT_CODE, JOB_CODE,SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY CUBE(DEPT_CODE,JOB_CODE)
+ORDER BY DEPT_CODE;
+
+/*
+CUBE는 ROLLUP 보다 더 포괄적인 집계 결과 생성
+CUBE 는 가능한 몯느 것을 조합하고 조합에 해당 결과와 총합 계산
+부서 직급 sum(
+*/
+
+--UNION INTERSECT MINUS
+
+--INTERSECT : 여러개의 SELECT 한 결과에서 공통 부분만 결과로 추출
+
+--부서코드가 'D5' 이면서 급여가 300만 초과하는 사원의
+--이름, 부서코드, 급여조회
+--1)부서코드가 'D5'
+SELECT EMP_NAME,DEPT_CODE,SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE='D5'
+
+INTERSECT
+
+--2) 급여가 300만원 초과
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000;
+
+--> INTERSECT 사용하지 ㅇ낳아도, GROUP BY WHERE 조건으로 구분지울 수 있음
+
+
+----MINUS : 선행 SELECT 결과에서 다음 SELECT 결과와 겹치는 부분을 제외한 나머지 부분만 추출----\
+
+--부서코드 D5 중 급여가 300만원 초과인 직원 제외
+--1) 부서코드가 'D5'
+SELECT EMP_NAME,DEPT_CODE,SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE='D5'
+
+MINUS
+
+--2) 급여가 300만원 초과
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000;
+
+--> MINUS 사용하지 않아도, GROUP BY WHERE 조건으로 구분지을 수 있음
+
+/*********
+집합 연산 (SET OPERATION)
+
+여러개의 SELECT 결과물을 하나의 쿼리로 만드는 연산자
+여러가지 조건이 있을 때 그에 해당하는 여러개의 결과값을 결합시키고 싶을 때 사용
+--장점 : 초보자들이 사용하기 좋음(조건을 덜 생각해도 됨)
+--주의할점 : 집합 연산에 사용되는 SELECT 문은 SELECT 절이 동일해야 함
+
+--UNION은 OR 같은 개념 --> 중복제거
+--INTERSECT AND 같은 개념
+--MINUS는    차집합 같은 개념
+--NUION ALL 은 OR 결과 값에 AND 결과 같이 더해진 값 --> 중복이 제거되지 않은 채로 합쳐짐
+***************/
+
+----UNINO : 여러개의 쿼리 결과를 하나로 합치는 연산자 ----
+--중복된 영역을 제외하여 하나로 합침
+
+--부서코드가 'D5'또는 'D6'인 사원 이름, 부서코드 조회
+
+---1) 부서코드가 'D5' 조회
+SELECT EMP_NAME, DEPT_CODE
+FROM MEPLOYEE
+WHERE DEPT_CODE='D5'
+
+SELECT EMP_NAME, DEPT_CODE
+FROM MEPLOYEE
+WHERE DEPT_CODE='D6'
+
+--UNION ALL : 여러개의 쿼리 결과를하나로 합치는 연산자
+--UNION 과 차이점은 중복영역을 모두 포함
+
+-- 부서코드 'D5' 이거나 급여가 300만 초과하는사원의
+--이름 부서코드 급여 조회 (중복포함)
+
+--1) 부서코드가 'D5'
+SELECT EMP_NEME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+
+UNION ALL
+
+SELECT EMP_NEME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALART > 30000000;
+
