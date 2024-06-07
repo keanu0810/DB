@@ -164,6 +164,31 @@ FROM EMPLOYEE;
 SELECT ROUND(AVG(SALARY))
 FROM EMPLOYEE;
 
+--TRUNC 버림 
+SELECT TRUNC(AVG(SALARY))
+FROM EMPLOYEE;
+
+--FLOOR TRUNC 차이
+--- 1) FLOOR : 주어진 숫자보다 작거나 가장 큰 정수를 반환
+-----소수 부분은 무조건 버림
+SELECT FLOOR(5.7) FROM DUAL; --결과 : 5
+SELECT FLOOR(-5.7) FROM DUAL; --결과 : -6
+SELECT FLOOR(5.789, 1) FROM DUAL; --에러 발생 소수 표현 X
+
+--- 2) TRUNC : 숫자의 소수점을 잘라내는 역할
+------ 자르고자 하는 자릿수를 지정 지정하지않으면 기본값 0
+SELECT TRUNC(5.7) FROM DUAL; --결과 : 5
+SELECT TRUNC(-5.7) FROM DUAL; --결과 : -5
+SELECT TRUNC(5.789, 1) FROM DUAL; --결과 : 5.7
+SELECT TRUNC(5.789, 2) FROM DUAL; --결과 : 5.78
+
+
+
+
+
+
+
+
 
 /*
 ***** TRIM  *****
@@ -230,14 +255,29 @@ FROM national;
 --TO_NUMBER
 /*
 Oracle sql 존재
-문자열을 숫자 데이터 형식으로 변환하는데 사용
+문자열을 숫자 데이터 형식으로 변환하는 데사용
 추후에 java int 값이 아니라 String 값으로 값이 넘어오고
-추후 변환이 필요할 떄  TO_NUMBER 사용할 일이 있을 수 있음
+추후 변환이 필요할 때는 TO_NUMBER 사용할 일이 있을 수 있음
 */
---DAUL 가상 테이블을 이용해서
---단순히 문자열을 숫자로 변환하는 코드
-SELECT TO_NUMBER('12345')
+-- DAUL 가상 테이블을 이용해서
+-- 단순히 문자열을 숫자로 변환하는 코드
+SELECT TO_NUMBER('12345') 
 FROM dual;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

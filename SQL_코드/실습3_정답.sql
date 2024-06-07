@@ -773,3 +773,40 @@ UPDATE EMPLOYEE2
 SET BUNUS = BONUS + 0.1,
 PHONE = '01033334444'
 WHERE 부서코드 = 'D4';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
